@@ -31,15 +31,31 @@ function App() {
       // Si es el botón de "equals", evalúa la expresión
       try {
         const result = eval(displayText); // Evalúa la expresión matemática
-        setDisplayText(result.toString()); // Muestra el resultado
+        const roundedResult = parseFloat(result.toFixed(5)); // Redondea a 5 decimales
+        setDisplayText(roundedResult.toString()); // Muestra el resultado redondeado
       } catch (error) {
         setDisplayText("Error"); // Maneja errores de evaluación
       }
     } else if (key === ".") {
       // Lógica para el punto decimal
-      const lastNumber = displayText.split(/[\+\-\*\/]/).pop(); // Obtiene el último número ingresado
+      const lastNumber = displayText.split(/[^0-9.]/).pop(); // Obtiene el último número ingresado
       if (lastNumber.includes(".")) return; // Si ese número ya tiene un punto decimal, no hace nada
       setDisplayText((prevText) => prevText + key);
+    } else if (["+", "-", "*", "/"].includes(key)) {
+      // Si el último carácter es un operador (excepto el negativo después de otro operador)
+      setDisplayText((prevText) => {
+        if (/[+\-*/]$/.test(prevText)) {
+          if (key === "-") {
+            // Permitir el signo negativo después de un operador
+            return prevText + key;
+          } else {
+            // Reemplazar múltiples operadores consecutivos con el último ingresado
+            return prevText.replace(/[+\-*/]+$/, key);
+          }
+        } else {
+          return prevText + key;
+        }
+      });
     } else {
       // Control para evitar números que empiecen con múltiples ceros
       if (displayText === "0" && key === "0") {
@@ -55,7 +71,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div id="mical">
       {/* Display para mostrar el texto */}
       <div id="display">{displayText}</div>
       {/* Renderizar los botones */}
@@ -74,6 +90,8 @@ function App() {
 
 // Renderizar el componente en el DOM
 ReactDOM.render(<App />, document.getElementById("root"));
+
+
 
 
  
