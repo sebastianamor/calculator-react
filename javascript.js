@@ -19,37 +19,56 @@ function App() {
     { key: "c", id: "clear" },
   ];
 
-  // Estado inicial del display es "0"
+  
   const [displayText, setDisplayText] = React.useState("0");
+ const [isSoundOn] = React.useState(true);
 
-  // Función para manejar el clic en los botones
+  React.useEffect(() => {
+    const handleKeyPress = (event) => {
+      const pad = pads.find((p) => p.key === event.key.toUpperCase());
+      if (pad) handleClick(pad.key, pad.id);
+    };
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [isSoundOn]);
+  
+  const cambiarColorFondo = () => {
+    const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+    document.body.style.backgroundColor = randomColor;
+  };
+  
+  
+  
+  
+  
+  
   const handleClick = (key) => {
     if (key === "c") {
-      // Si es el botón de "clear", restablece el display a "0"
+     
       setDisplayText("0");
     } else if (key === "=") {
-      // Si es el botón de "equals", evalúa la expresión
+     
       try {
-        const result = eval(displayText); // Evalúa la expresión matemática
-        const roundedResult = parseFloat(result.toFixed(5)); // Redondea a 5 decimales
-        setDisplayText(roundedResult.toString()); // Muestra el resultado redondeado
+        const result = eval(displayText);
+        const roundedResult = parseFloat(result.toFixed(5)); 
+        setDisplayText(roundedResult.toString()); 
       } catch (error) {
-        setDisplayText("Error"); // Maneja errores de evaluación
+        setDisplayText("Error"); 
       }
     } else if (key === ".") {
-      // Lógica para el punto decimal
-      const lastNumber = displayText.split(/[^0-9.]/).pop(); // Obtiene el último número ingresado
-      if (lastNumber.includes(".")) return; // Si ese número ya tiene un punto decimal, no hace nada
+     
+      const lastNumber = displayText.split(/[^0-9.]/).pop(); 
+      if (lastNumber.includes(".")) return; 
       setDisplayText((prevText) => prevText + key);
     } else if (["+", "-", "*", "/"].includes(key)) {
-      // Si el último carácter es un operador (excepto el negativo después de otro operador)
+      
       setDisplayText((prevText) => {
         if (/[+\-*/]$/.test(prevText)) {
           if (key === "-") {
-            // Permitir el signo negativo después de un operador
+           
             return prevText + key;
           } else {
-            // Reemplazar múltiples operadores consecutivos con el último ingresado
+           
             return prevText.replace(/[+\-*/]+$/, key);
           }
         } else {
@@ -57,14 +76,14 @@ function App() {
         }
       });
     } else {
-      // Control para evitar números que empiecen con múltiples ceros
+      
       if (displayText === "0" && key === "0") {
-        return; // No hace nada si se intenta poner otro "0" al inicio
+        return; 
       } else if (displayText === "0" && key !== ".") {
-        // Reemplaza el "0" inicial si se ingresa un número diferente de "."
+       
         setDisplayText(key);
       } else {
-        // Concatena el valor del botón al display
+        
         setDisplayText((prevText) => prevText + key);
       }
     }
@@ -72,26 +91,34 @@ function App() {
 
   return (
     <div id="mical">
-      {/* Display para mostrar el texto */}
+      <label class="switch">
+     <input type="checkbox"
+       onClick={() => {
+          cambiarColorFondo();
+        }}
+       /> 
+      <div class="slider round">  </div>
+      </label>
+       <h2>色変更</h2> 
+      
+      {}
       <div id="display">{displayText}</div>
-      {/* Renderizar los botones */}
+      {}
       {pads.map((pad, index) => (
         <button
-          key={index} // Usamos el índice como clave única
-          id={pad.id} // Accedemos a la propiedad `id` del objeto `pad`
-          onClick={() => handleClick(pad.key)} // Manejador de clic
+          key={index} 
+          id={pad.id} 
+          onClick={() => handleClick(pad.key)}
         >
-          {pad.key} {/* Accedemos a la propiedad `key` del objeto `pad` */}
+          {pad.key} {}
         </button>
       ))}
     </div>
   );
 }
 
-// Renderizar el componente en el DOM
+
 ReactDOM.render(<App />, document.getElementById("root"));
-
-
 
 
  
